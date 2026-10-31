@@ -1,0 +1,345 @@
+<title>Daily Diff, Annotated</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column, sticky lane filter, stories grouped by distance from the reader's own work.
+   Each story = plain line, "in your terms" mapping, optional concept primer, expandable worked example + claim check written as a diff.
+   DO NOT EDIT the CSS or the render script. Fill only the DATA block in the <script> at the bottom. */
+:root {
+  --paper: #F3F4F7; --card: #FFFFFF; --ink: #161A22; --muted: #5A6271; --rule: #D9DCE3;
+  --accent: #3045C4; --tint: #E9ECF8;
+  --add: #1D7149; --add-bg: #E5F3EB; --del: #A8353A; --del-bg: #F8E7E7;
+  --lane-1: #3045C4; --lane-2: #7A3FB0; --lane-3: #9A5A00; --lane-4: #0D6F6E; --lane-skim: #6A7281;
+  --learn: #7A3FB0; --learn-bg: #F3ECFA;
+  --f-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Literata", Georgia, "Times New Roman", serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #11141A; --card: #191D25; --ink: #E5E8EE; --muted: #9AA2B1; --rule: #2B303B;
+    --accent: #93A2FF; --tint: #1F2440; --add: #6BCB97; --add-bg: #15291F; --del: #F08A8A; --del-bg: #2E1A1C;
+    --lane-1: #93A2FF; --lane-2: #C9A2F2; --lane-3: #E6A548; --lane-4: #4CC6C3; --lane-skim: #9AA2B1;
+    --learn: #C9A2F2; --learn-bg: #261D33; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #11141A; --card: #191D25; --ink: #E5E8EE; --muted: #9AA2B1; --rule: #2B303B;
+  --accent: #93A2FF; --tint: #1F2440; --add: #6BCB97; --add-bg: #15291F; --del: #F08A8A; --del-bg: #2E1A1C;
+  --lane-1: #93A2FF; --lane-2: #C9A2F2; --lane-3: #E6A548; --lane-4: #4CC6C3; --lane-skim: #9AA2B1;
+  --learn: #C9A2F2; --learn-bg: #261D33; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--f-body); font-size: 16px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+.wrap { max-width: 720px; margin: 0 auto; padding-block: 28px 64px; }
+code { font-family: var(--f-mono); font-size: 0.84em; background: var(--tint); padding: 1px 5px; border-radius: 4px; word-break: break-word; }
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.mast { display: grid; gap: 10px; padding-bottom: 18px; }
+.edition { font-family: var(--f-mono); font-size: 12px; letter-spacing: .04em; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.edition b { color: var(--ink); font-weight: 600; }
+h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(34px, 8vw, 54px); line-height: 1; margin: 0; letter-spacing: -0.02em; text-wrap: balance; }
+h1 .d { display: inline-block; font-family: var(--f-mono); font-weight: 600; font-size: .5em; vertical-align: .45em; margin-right: 6px; padding: 0 6px; border-radius: 4px; }
+h1 .d.m { color: var(--del); background: var(--del-bg); }
+h1 .d.p { color: var(--add); background: var(--add-bg); }
+.dek { margin: 0; color: var(--muted); max-width: 62ch; }
+
+.legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 6px 0 22px; }
+.legend div { font-size: 14px; line-height: 1.45; color: var(--muted); }
+.legend strong { display: block; font-family: var(--f-display); font-weight: 700; color: var(--ink); font-size: 15px; }
+
+.picks { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px; margin-bottom: 26px; }
+.picks h2 { font-family: var(--f-display); font-size: 20px; margin: 0 0 4px; }
+.picks p.sub { margin: 0 0 10px; color: var(--muted); font-size: 14px; }
+.picks ol { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
+.picks li a { font-weight: 600; text-decoration: none; }
+.picks li a:hover { text-decoration: underline; }
+.picks li span { display: block; color: var(--muted); font-size: 14px; line-height: 1.45; }
+
+.filters { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--paper); padding-block: 10px; margin: 0 -4px 6px; padding-inline: 4px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--rule); }
+.filters::-webkit-scrollbar { display: none; }
+.chip { flex: none; font-family: var(--f-mono); font-size: 12.5px; border: 1px solid var(--rule); background: var(--card); color: var(--ink); padding: 6px 11px; border-radius: 999px; cursor: pointer; white-space: nowrap; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.chip .n { color: var(--muted); margin-left: 4px; }
+.chip[aria-pressed="true"] .n { color: inherit; opacity: .7; }
+.progress { flex: none; margin-left: auto; align-self: center; font-family: var(--f-mono); font-size: 12px; color: var(--muted); padding-left: 8px; white-space: nowrap; }
+
+section.lane { margin-top: 30px; }
+.lane-head { display: grid; gap: 4px; margin-bottom: 14px; }
+.lane-head h2 { font-family: var(--f-display); font-size: 24px; line-height: 1.15; margin: 0; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.lane-head h2 .sw { width: 10px; height: 10px; border-radius: 2px; display: inline-block; flex: none; transform: translateY(-2px); }
+.lane-head p { margin: 0; color: var(--muted); font-size: 15px; max-width: 62ch; }
+
+.track { background: var(--learn-bg); border-radius: 10px; padding: 14px 18px; margin-bottom: 14px; }
+.track h3 { font-family: var(--f-display); font-size: 17px; margin: 0 0 2px; color: var(--learn); }
+.track > p { margin: 0 0 10px; font-size: 14px; color: var(--muted); }
+.track ol { margin: 0; padding-left: 20px; display: grid; gap: 8px; font-size: 15px; line-height: 1.45; }
+.track li span { display: block; color: var(--muted); font-size: 14px; }
+
+.story { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px 14px; margin-bottom: 12px; min-width: 0; }
+.story.done { opacity: .55; }
+.meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-family: var(--f-mono); font-size: 11.5px; color: var(--muted); margin-bottom: 6px; }
+.tag { text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
+.verdict { padding: 1px 7px; border-radius: 4px; border: 1px solid var(--rule); }
+.verdict.go { color: var(--add); border-color: currentColor; }
+.story h3 { font-family: var(--f-display); font-weight: 700; font-size: 19px; line-height: 1.25; margin: 0 0 8px; text-wrap: balance; }
+.what { margin: 0 0 10px; }
+.yours { margin: 0; font-size: 15px; background: var(--tint); border-radius: 6px; padding: 9px 12px; line-height: 1.5; }
+.yours b { font-family: var(--f-display); font-weight: 700; font-size: 13px; letter-spacing: .02em; display: block; color: var(--accent); }
+.concept { margin-top: 10px; background: var(--learn-bg); border-radius: 6px; padding: 11px 13px; font-size: 15px; line-height: 1.5; display: grid; gap: 6px; }
+.concept .ctag { font-family: var(--f-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--learn); font-weight: 600; }
+.concept h4 { margin: 0; font-family: var(--f-display); font-size: 16px; }
+.concept p { margin: 0; }
+.concept b { font-family: var(--f-display); font-size: 13.5px; }
+details.more { margin-top: 10px; }
+details.more > summary { cursor: pointer; font-family: var(--f-mono); font-size: 12.5px; color: var(--accent); list-style: none; padding: 4px 0; }
+details.more > summary::-webkit-details-marker { display: none; }
+details.more > summary::before { content: "+ "; }
+details.more[open] > summary::before { content: "− "; }
+.body { display: grid; gap: 14px; padding-top: 8px; }
+.blk h4 { margin: 0 0 4px; font-family: var(--f-display); font-size: 13px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.blk p { margin: 0; }
+.blk p + p { margin-top: 8px; }
+.ex { background: var(--paper); border: 1px solid var(--rule); border-radius: 8px; padding: 12px 14px; }
+.ex pre { margin: 8px 0 0; font-family: var(--f-mono); font-size: 12.5px; line-height: 1.55; overflow-x: auto; white-space: pre; background: var(--card); border: 1px solid var(--rule); border-radius: 6px; padding: 10px 12px; }
+.ex pre + p { margin-top: 8px; }
+dl.terms { margin: 0; display: grid; gap: 6px; }
+dl.terms div { display: grid; grid-template-columns: minmax(110px, 30%) 1fr; gap: 10px; font-size: 14.5px; line-height: 1.45; }
+dl.terms dt { font-family: var(--f-mono); font-size: 12.5px; font-weight: 600; padding-top: 2px; }
+dl.terms dd { margin: 0; }
+@media (max-width: 460px) { dl.terms div { grid-template-columns: 1fr; gap: 0; } }
+.diff { font-family: var(--f-mono); font-size: 12.5px; line-height: 1.5; border-radius: 6px; overflow: hidden; border: 1px solid var(--rule); }
+.diff div { padding: 6px 10px 6px 26px; position: relative; }
+.diff div::before { position: absolute; left: 10px; font-weight: 600; }
+.diff .m { background: var(--del-bg); color: var(--del); }
+.diff .m::before { content: "−"; }
+.diff .p { background: var(--add-bg); color: var(--add); }
+.diff .p::before { content: "+"; }
+.foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--rule); font-family: var(--f-mono); font-size: 12.5px; }
+.foot label { margin-left: auto; display: inline-flex; gap: 6px; align-items: center; color: var(--muted); cursor: pointer; }
+.foot input { accent-color: var(--accent); width: 16px; height: 16px; }
+
+.skim { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 6px 18px; }
+.skim .row { padding: 12px 0; border-bottom: 1px solid var(--rule); display: grid; gap: 3px; }
+.skim .row:last-child { border-bottom: 0; }
+.skim .row h3 { font-family: var(--f-display); font-size: 16px; margin: 0; line-height: 1.3; }
+.skim .row p { margin: 0; font-size: 15px; line-height: 1.5; }
+.skim .row .why { color: var(--muted); font-size: 14px; }
+.skim .row a { font-family: var(--f-mono); font-size: 12px; }
+
+.dots { margin-top: 34px; display: grid; gap: 12px; }
+.dots > h2 { font-family: var(--f-display); font-size: 24px; margin: 0; }
+.dots > p { margin: 0; color: var(--muted); }
+.dot { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px; }
+.dot h3 { font-family: var(--f-display); font-size: 18px; margin: 0 0 6px; line-height: 1.25; }
+.dot p { margin: 0 0 8px; }
+.dot p:last-child { margin-bottom: 0; }
+.pills { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 10px; }
+.pills a { font-family: var(--f-mono); font-size: 11.5px; text-decoration: none; border: 1px solid var(--rule); border-radius: 999px; padding: 2px 9px; color: var(--ink); }
+.pills a:hover { border-color: var(--accent); color: var(--accent); }
+
+.gloss { margin-top: 34px; }
+.gloss > summary { cursor: pointer; font-family: var(--f-display); font-size: 22px; font-weight: 700; list-style: none; }
+.gloss > summary::-webkit-details-marker { display: none; }
+.gloss > summary span { font-family: var(--f-mono); font-size: 12px; font-weight: 400; color: var(--muted); margin-left: 8px; }
+.gloss input { width: 100%; margin: 12px 0; font: inherit; font-size: 15px; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--rule); background: var(--card); color: var(--ink); }
+.gloss dl.terms { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 12px 16px; }
+.gloss dl.terms div { padding: 6px 0; border-bottom: 1px solid var(--rule); }
+.gloss dl.terms div:last-child { border-bottom: 0; }
+.colophon { margin-top: 36px; font-size: 13.5px; color: var(--muted); }
+@media (prefers-reduced-motion: no-preference) { .story { transition: opacity .2s; } }
+</style>
+
+<div class="wrap">
+  <header class="mast" id="mast"></header>
+  <div class="legend" id="legend"></div>
+  <aside class="picks" id="picks"></aside>
+  <nav class="filters" id="filters" aria-label="Filter stories by lane"></nav>
+  <main id="lanes"></main>
+  <section class="dots" id="dots"></section>
+  <details class="gloss" id="gloss">
+    <summary>Glossary <span id="gcount"></span></summary>
+    <input id="gq" type="search" placeholder="Search terms" aria-label="Search glossary">
+    <dl class="terms" id="glist"></dl>
+  </details>
+  <p class="colophon" id="colophon"></p>
+</div>
+
+<script>
+/* ===================== DATA START =====================
+   Replace everything between DATA START and DATA END for each edition.
+   Plain-text fields are escaped. Only `example` takes HTML (<p>, <pre>, <code>).
+   The values below are a SAMPLE for an imaginary reader. Replace all of them. */
+
+const EDITION = {
+  date: "2026-10-25",                       // YYYY-MM-DD, also used for the read-marks key
+  label: "Sun 25 Oct 2026",
+  count: 3,                                 // stories in the edition
+  source: "tdd.cat",
+  sourceUrl: "https://tdd.cat/",
+  headline: ["The Daily Diff", "read by a backend engineer"],   // second line names the reader
+  dek: "SAMPLE. The same edition, re-sorted around your work and what you're learning. Every story gets a plain one-liner, a translation into things you already know, and a worked example.",
+  conceptLabel: "Concept",                  // tag on concept primers, e.g. "DS concept"
+  picksIntro: "Picked for what you're working on this month.",
+  picks: [ { id: "ub", why: "SAMPLE: why this one matters for this reader." } ],
+  dotsIntro: "The edition runs stories that talk to each other but never says so. Here's what they add up to.",
+  dots: [ { title: "SAMPLE: what two stories add up to", ids: ["ub", "mongo"], paras: ["One or two short paragraphs connecting the stories."] } ],
+  colophon: "Built from The Daily Diff edition of 25 Oct 2026, curated by Arpit Bhayani. Explanations are rewritten; numbers come from the original summaries, and worked examples use illustrative figures unless they say otherwise.",
+  archiveUrl: ""                            // optional link to past editions
+};
+
+/* 3–5 lanes, closest to the reader first. tone: 1–4 or "skim". The lane with learn:true gets the reading path. */
+const LANES = [
+  { id: "core",  name: "Your lane", tone: 1, blurb: "Close to your daily work. Read at full speed." },
+  { id: "learn", name: "Learning lane", tone: 2, learn: true, blurb: "Each card teaches one idea from scratch." },
+  { id: "skim",  name: "Skim", tone: "skim", blurb: "One line each is enough." }
+];
+
+/* Optional reading path shown at the top of the learn lane. Set to null to hide. Never invent a source. */
+const TRACK = {
+  title: "A reading path, in order",
+  intro: "Approachable first, papers later.",
+  items: [ { title: "Designing Data-Intensive Applications, chapter 5 (Replication)", note: "SAMPLE note.", url: "" } ]
+};
+
+/* One entry per story. Non-skim fields: id, lane, go, title, what, yours, concept?, example, terms, claim?, src, hn.
+   Skim fields: id, lane:"skim", title, what, why, src, hn. */
+const S = [
+  { id: "ub", lane: "core", go: true,
+    title: "Undefined behaviour in C++ doesn't just segfault",
+    what: "Optimisers assume UB never happens and delete code on that basis.",
+    yours: "SAMPLE: link to the reader's own code or project, only where the link is real.",
+    example: `<pre>int x = *p;          // compiler now "knows" p != null
+if (p == nullptr)    // so this check is deleted
+    return -1;</pre>`,
+    terms: [["undefined behaviour (UB)", "Code the language standard gives no meaning to."]],
+    claim: null,
+    src: "https://blog.habets.se/2026/10/Attention-people-who-think-UB-is-fine.html", hn: "https://news.ycombinator.com/item?id=50227814" },
+  { id: "mongo", lane: "learn", go: false,
+    title: "MongoDB keeps a dozen drivers consistent with shared JSON test specs",
+    what: "Every driver runs the same language-agnostic test files.",
+    yours: "SAMPLE.",
+    concept: { name: "Causal consistency", def: "Explained from zero.", near: "The same idea on one machine.", read: "One approachable next read." },
+    example: `<pre>write → primary, opTime 105
+read  → secondary at 98 → waits until 105</pre>`,
+    terms: [["replica", "A copy of the data on another machine."]],
+    claim: ["The summary's closing line.", "A more careful version."],
+    src: "https://emptysqua.re/blog/polyglots-dilemma/", hn: "https://news.ycombinator.com/item?id=50231257" },
+  { id: "luu", lane: "skim", title: "Dan Luu: speed of execution helps you find the right problems",
+    what: "Fast teams run more experiments.", why: "Career-shaped reading.",
+    src: "https://danluu.com/productivity-velocity/", hn: "https://news.ycombinator.com/item?id=50235708" }
+];
+/* ===================== DATA END ===================== */
+
+const esc = s => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const toneVar = t => t === "skim" ? "var(--lane-skim)" : `var(--lane-${t || 1})`;
+const KEY = "dd-read-" + EDITION.date;
+let readSet = new Set();
+try { readSet = new Set(JSON.parse(localStorage.getItem(KEY) || "[]")); } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify([...readSet])); } catch (e) {} };
+const byId = id => S.find(s => s.id === id);
+
+document.getElementById("mast").innerHTML =
+  `<div class="edition"><span><b>${esc(EDITION.label)}</b></span><span>${esc(EDITION.count)} stories</span><span>source: <a href="${esc(EDITION.sourceUrl)}" target="_blank" rel="noopener">${esc(EDITION.source)}</a></span>${EDITION.archiveUrl ? `<a href="${esc(EDITION.archiveUrl)}" target="_blank" rel="noopener">past editions ↗</a>` : ""}</div>
+   <h1><span class="d m">−</span>${esc(EDITION.headline[0])}<br><span class="d p">+</span>${esc(EDITION.headline[1])}</h1>
+   <p class="dek">${esc(EDITION.dek)}</p>`;
+
+document.getElementById("legend").innerHTML = [
+  ["In your terms", "What the story means next to your own work."],
+  [EDITION.conceptLabel, "One idea from the story, explained from zero, with what to read next."],
+  ["Worked example", "Concrete numbers or code, so the idea sticks."],
+  ["Claim check", "The summary's takeaway (−) next to a more careful version (+)."]
+].map(([a, b]) => `<div><strong>${esc(a)}</strong>${esc(b)}</div>`).join("");
+
+const picks = (EDITION.picks || []).filter(p => byId(p.id));
+document.getElementById("picks").innerHTML = picks.length ? `<h2>If you only read ${picks.length === 3 ? "three" : picks.length}</h2><p class="sub">${esc(EDITION.picksIntro)}</p><ol>${picks.map(p => `<li><a href="#${esc(p.id)}">${esc(p.label || byId(p.id).title)}</a><span>${esc(p.why)}</span></li>`).join("")}</ol>` : "";
+document.getElementById("picks").hidden = !picks.length;
+
+function card(s) {
+  const lane = LANES.find(l => l.id === s.lane);
+  const c = s.concept;
+  const co = c ? `<div class="concept"><div class="ctag">${esc(EDITION.conceptLabel)}</div><h4>${esc(c.name)}</h4><p>${esc(c.def)}</p><p><b>On one machine:</b> ${esc(c.near)}</p><p><b>Read next:</b> ${esc(c.read)}</p></div>` : "";
+  const terms = s.terms && s.terms.length ? `<div class="blk"><h4>Terms</h4><dl class="terms">${s.terms.map(([t, d]) => `<div><dt>${esc(t)}</dt><dd>${esc(d)}</dd></div>`).join("")}</dl></div>` : "";
+  const ex = s.example ? `<div class="blk ex"><h4>Worked example</h4>${s.example}</div>` : "";
+  const cl = s.claim ? `<div class="blk"><h4>Claim check</h4><div class="diff"><div class="m">Summary: ${esc(s.claim[0])}</div><div class="p">${esc(s.claim[1])}</div></div></div>` : "";
+  const parts = [s.example && "example", s.claim && "claim check", s.terms && s.terms.length && "terms"].filter(Boolean).join(", ");
+  return `<article class="story${readSet.has(s.id) ? " done" : ""}" id="${esc(s.id)}">
+    <div class="meta"><span class="tag" style="color:${toneVar(lane.tone)}">${esc(lane.name)}</span>${s.go ? `<span class="verdict go">read the original</span>` : `<span class="verdict">this card is enough</span>`}</div>
+    <h3>${esc(s.title)}</h3>
+    <p class="what">${esc(s.what)}</p>
+    <p class="yours"><b>In your terms</b>${esc(s.yours)}</p>
+    ${co}
+    ${parts ? `<details class="more"><summary>${parts}</summary><div class="body">${ex}${cl}${terms}</div></details>` : ""}
+    <div class="foot"><a href="${esc(s.src)}" target="_blank" rel="noopener">Source ↗</a>${s.hn ? `<a href="${esc(s.hn)}" target="_blank" rel="noopener">Discussion ↗</a>` : ""}
+      <label><input type="checkbox" id="r-${esc(s.id)}" data-id="${esc(s.id)}"${readSet.has(s.id) ? " checked" : ""}> read</label></div>
+  </article>`;
+}
+const skimRow = s => `<div class="row" id="${esc(s.id)}"><h3>${esc(s.title)}</h3><p>${esc(s.what)}</p><p class="why">${esc(s.why)}</p><div><a href="${esc(s.src)}" target="_blank" rel="noopener">Source ↗</a>${s.hn ? ` · <a href="${esc(s.hn)}" target="_blank" rel="noopener">Discussion ↗</a>` : ""}</div></div>`;
+const trackHtml = () => TRACK && TRACK.items && TRACK.items.length ? `<div class="track"><h3>${esc(TRACK.title)}</h3><p>${esc(TRACK.intro)}</p><ol>${TRACK.items.map(i => `<li>${i.url ? `<a href="${esc(i.url)}" target="_blank" rel="noopener">${esc(i.title)}</a>` : esc(i.title)}<span>${esc(i.note)}</span></li>`).join("")}</ol></div>` : "";
+
+const main = document.getElementById("lanes");
+main.innerHTML = LANES.map(l => {
+  const items = S.filter(s => s.lane === l.id);
+  if (!items.length) return "";
+  const inner = l.tone === "skim" ? `<div class="skim">${items.map(skimRow).join("")}</div>` : (l.learn ? trackHtml() : "") + items.map(card).join("");
+  return `<section class="lane" data-lane="${esc(l.id)}"><div class="lane-head"><h2><span class="sw" style="background:${toneVar(l.tone)}"></span>${esc(l.name)}</h2><p>${esc(l.blurb)}</p></div>${inner}</section>`;
+}).join("");
+
+const dotsEl = document.getElementById("dots");
+const dots = EDITION.dots || [];
+dotsEl.hidden = !dots.length;
+dotsEl.innerHTML = dots.length ? `<h2>Connecting the dots</h2><p>${esc(EDITION.dotsIntro)}</p>` + dots.map(d => `<div class="dot"><h3>${esc(d.title)}</h3><div class="pills">${(d.ids || []).filter(byId).map(id => `<a href="#${esc(id)}">${esc(byId(id).short || byId(id).title.split(/[:,—]/)[0].slice(0, 40))}</a>`).join("")}</div>${(d.paras || []).map(p => `<p>${esc(p)}</p>`).join("")}</div>`).join("") : "";
+
+document.getElementById("colophon").textContent = EDITION.colophon + " Your read marks stay in this browser.";
+
+const deep = S.filter(s => { const l = LANES.find(x => x.id === s.lane); return l && l.tone !== "skim"; });
+function updateProgress() { document.getElementById("prog").textContent = `${[...readSet].filter(id => deep.some(s => s.id === id)).length}/${deep.length} read`; }
+const f = document.getElementById("filters");
+const usedLanes = LANES.filter(l => S.some(s => s.lane === l.id));
+f.innerHTML = `<button class="chip" type="button" aria-pressed="true" data-lane="all">All<span class="n">${S.length}</span></button>` +
+  usedLanes.map(l => `<button class="chip" type="button" aria-pressed="false" data-lane="${esc(l.id)}">${esc(l.name)}<span class="n">${S.filter(s => s.lane === l.id).length}</span></button>`).join("") +
+  `<span class="progress" id="prog"></span>`;
+f.addEventListener("click", e => {
+  const b = e.target.closest(".chip"); if (!b) return;
+  f.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", c === b ? "true" : "false"));
+  const v = b.dataset.lane;
+  document.querySelectorAll("section.lane").forEach(sec => { sec.hidden = !(v === "all" || sec.dataset.lane === v); });
+  dotsEl.hidden = v !== "all" || !dots.length;
+});
+main.addEventListener("change", e => {
+  const id = e.target.dataset && e.target.dataset.id; if (!id) return;
+  e.target.checked ? readSet.add(id) : readSet.delete(id);
+  document.getElementById(id).classList.toggle("done", e.target.checked);
+  save(); updateProgress();
+});
+updateProgress();
+
+document.addEventListener("click", e => {
+  const a = e.target.closest('a[href^="#"]'); if (!a) return;
+  const el = document.getElementById(a.getAttribute("href").slice(1)); if (!el) return;
+  const sec = el.closest("section.lane"); if (sec && sec.hidden) f.querySelector('[data-lane="all"]').click();
+  const d = el.querySelector("details.more"); if (d) d.open = true;
+});
+
+const seen = new Map();
+S.forEach(s => (s.terms || []).forEach(([t, d]) => { if (!seen.has(t.toLowerCase())) seen.set(t.toLowerCase(), [t, d, s.id]); }));
+const gl = [...seen.values()].sort((a, b) => a[0].localeCompare(b[0]));
+const glist = document.getElementById("glist");
+function renderGloss(q) {
+  const rows = gl.filter(([t, d]) => !q || (t + " " + d).toLowerCase().includes(q));
+  glist.innerHTML = rows.length ? rows.map(([t, d, id]) => `<div><dt>${esc(t)}</dt><dd>${esc(d)} <a href="#${esc(id)}">see story</a></dd></div>`).join("") : `<div><dd>No term matches. Try a shorter word.</dd></div>`;
+}
+document.getElementById("gcount").textContent = gl.length + " terms";
+document.getElementById("gloss").hidden = !gl.length;
+document.getElementById("gq").addEventListener("input", e => renderGloss(e.target.value.trim().toLowerCase()));
+renderGloss("");
+</script>
