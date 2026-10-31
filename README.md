@@ -166,8 +166,3 @@ produces reveals details from the profile, so read it before you share it.
 All curation comes from The Daily Diff by Arpit Bhayani. This skill only rewrites the
 explanations for one reader. Read and support the original at https://tdd.cat/.
 
-## Disclaimer
-
-This skill, including `SKILL.md`, the page template and this README, was made with the
-help of Claude Opus. I reviewed it, but it may still have mistakes, so check anything
-important against the original stories.
