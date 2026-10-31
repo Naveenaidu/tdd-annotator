@@ -1,10 +1,8 @@
-## Disclaimer
-
-This skill, including `SKILL.md`, the page template and some part of this README, was made
-with the help of Claude Opus. I reviewed it, but it may still have mistakes, so check
-anything important against the original stories.
-
 # Daily Diff Annotator
+
+> **Disclaimer:** This skill, including `SKILL.md`, the page template and some part of
+> this README, was made with the help of Claude Opus. I reviewed it, but it may still have
+> mistakes, so check anything important against the original stories.
 
 A Claude skill that rebuilds today's edition of [The Daily Diff](https://tdd.cat/), the
 engineering newspaper curated by [Arpit Bhayani](https://arpitbhayani.me/), as a page
